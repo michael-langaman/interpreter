@@ -1,0 +1,197 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Stack;
+import Element;
+
+public class interpreter {
+	
+	private static Stack<Element> _stack;
+	private static ArrayList<String> _commands;
+	
+	public static void push(Element e) {
+		if(elem.equals("-0")) _stack.push(new Element(0));
+		else {
+			_stack.push(e);
+		}
+	}
+	
+	public static void pop() {
+		if(_stack.empty()) {
+			_stack.push(new Element(":error:"));
+		} else {
+			_stack.pop();
+		}
+	}
+
+	public static void neg() {
+		if(_stack.empty()) {
+			_stack.push(new Element(":error:"));
+		} else {
+			Element a = _stack.pop();
+			if(!a.isInt()) {
+				_stack.push(a);
+				_stack.push(new Element(":error:"));
+			} else {
+				int num = a.getIntVal();
+				num *= -1;
+				Element result = new Element(num);
+				_stack.push(result);
+			}
+		}
+	}
+	
+	public static void swap() {
+		if(_stack.size() < 2) {
+			_stack.push(":error:");
+			return;
+		} else {
+			String a = _stack.pop();
+			String b = _stack.pop();
+			_stack.push(a);
+			_stack.push(b);
+		}
+	}
+
+	public static void math(String oper) {
+		boolean dne = false;
+		if(_stack.size() < 2) _stack.push(":error:");
+		else {
+			Element a = _stack.pop();
+			Element b = _stack.pop();
+			if(a.isInt() && b.isInt()) {
+				int x = a.getIntVal();
+				int y = b.getIntVal();
+				int ans = 0;
+				if(oper.equals("add")) ans = x + y;
+				else if(oper.equals("sub")) ans = y - x;
+				else if(oper.equals("mul")) ans = x * y;
+				else if(oper.equals("div")) { 
+					if(x == 0) {
+						_stack.push(b);
+						_stack.push(a);
+						_stack.push(":error:");
+						dne = true;
+					} else { ans = y / x; }
+				} else if(oper.equals("rem")) {
+					if(x == 0) {
+						_stack.push(b);
+						_stack.push(a);
+						_stack.push(":error:");
+						dne = true;
+					} else { ans = y % x; }
+				}
+				Element result = new Element(ans);
+				if(!dne) _stack.push(result);
+			} else {
+				_stack.push(b);
+				_stack.push(a);
+				_stack.push(new Element(":error:"));
+			}
+		}
+	}
+
+	public static void getLines(String inFile) {
+		_commands = new ArrayList<String>();
+		try {
+			FileReader read = new FileReader(inFile);
+			BufferedReader buffR = new BufferedReader(read);
+
+			String line = null;
+			while((line = buffR.readLine()) != null) {
+            	_commands.add(line);
+        	}
+        	buffR.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static void writeOutput(String outFile) {
+		BufferedWriter buffW = null;
+		try {
+			FileWriter write = new FileWriter(outFile);
+			buffW = new BufferedWriter(write);
+			while(!_stack.empty()) {
+				String p = _stack.pop();
+				buffW.write(p);
+				buffW.newLine();
+			}
+			buffW.close();
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public static boolean isNum(String a) {
+		try {
+			Integer.parseInt(a);
+			return true;
+		} catch(NumberFormatException ex) {
+			return false;
+		}
+	}
+
+	public static void interpreter(String inFile, String outFile) {
+		_stack = new Stack<Element>();
+		getLines(inFile);
+		for(int i = 0; i < _commands.size(); ++i) {
+			String[] line = _commands.get(i).split(" ");		
+			String command = line[0];
+			String value = "";
+			if(line.length > 1) {
+				value = line[1];
+			}
+			Element e = null;
+			if(isNum(value)) {
+				e = new Element(Integer.parseInt(value));
+			} else {
+				e = new Element(value);
+			}
+			switch(command) {
+			case "push":
+				push(element);
+				break;
+			case "pop":
+				pop();
+				break;
+			case ":true:":
+				_stack.push(command);
+				break;
+			case ":false:":
+				_stack.push(command);
+				break;
+			case ":error:":
+				_stack.push(command);
+				break;
+			case "add":
+				math(command);
+				break;
+			case "sub":
+				math(command);
+				break;
+			case "mul":
+				math(command);
+				break;
+			case "div":
+				math(command);
+				break;
+			case "rem":
+				math(command);
+				break;
+			case "neg":
+				neg();
+				break;
+			case "swap":
+				swap();
+				break;
+			case "quit":
+				writeOutput(outFile);
+				break;
+			}
+		}
+	}
+}

@@ -1,0 +1,40 @@
+public class Element {
+
+	private String _str;
+	private int _num;
+	private static int NULL = -1024;
+
+	public Element() {
+		_str = null;
+		_num = -1024;
+	}
+
+	public Element(int num) {
+		_str = null;
+		_num = NULL;
+	}
+
+	public Element(String str) {
+		_str = str;
+		_num = null;
+	}
+
+	public boolean isInt() {
+		if(_num != null) {
+			return _num = (int) _num;
+		}
+		return false;
+	}
+
+	public boolean isStr() {
+		return _str != null;
+	}
+
+	public int getIntVal() {
+		return _num;
+	}
+
+	public String getStrVal() {
+		return _str;
+	}
+}
